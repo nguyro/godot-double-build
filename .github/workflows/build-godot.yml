@@ -1,5 +1,6 @@
 name: Build Godot 4.4 Double Precision
  
+# Trigger manually
 on:
   workflow_dispatch:
  
@@ -8,25 +9,34 @@ jobs:
     runs-on: windows-2022
  
     steps:
-      - name: Checkout Godot source
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
  
-      - name: Install dependencies
-        run: |
-          choco install -y python3 scons git
-        shell: powershell
+      # 2️⃣ Install Python
+      - name: Setup Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
  
-      - name: Clone Godot 4.4
+      # 3️⃣ Upgrade pip and install SCons
+      - name: Install SCons
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install scons
+ 
+      # 4️⃣ Clone Godot 4.4 source
+      - name: Clone Godot 4.4 stable
         run: git clone --branch 4.4-stable https://github.com/godotengine/godot.git godot
  
+      # 5️⃣ Build Godot editor with double precision
       - name: Build Godot editor (double precision)
         run: |
           cd godot
-          python3 -m pip install --upgrade pip
           scons platform=windows target=editor arch=x86_64 precision=double -j %NUMBER_OF_PROCESSORS%
-        shell: cmd
  
-      - name: Upload build artifacts
+      # 6️⃣ Upload the editor artifact
+      - name: Upload Godot editor
         uses: actions/upload-artifact@v4
         with:
           name: godot-double-windows
