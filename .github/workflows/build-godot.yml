@@ -1,10 +1,10 @@
-name: Quick Test Godot Build
+name: Build Godot 4.4 Double Precision
  
 on:
   workflow_dispatch:
  
 jobs:
-  quick-test:
+  build:
     runs-on: windows-2022
  
     steps:
@@ -28,15 +28,15 @@ jobs:
       - name: Clone Godot 4.4 stable
         run: git clone --branch 4.4-stable https://github.com/godotengine/godot.git godot
  
-      # 5️⃣ Quick build of a single editor module (tiny, ~2–5 min)
-      - name: Quick single-module build
+      # 5️⃣ Build Godot editor with double precision
+      - name: Build Godot editor (double precision)
         run: |
           cd godot
-          scons platform=windows target=editor arch=x86_64 precision=double tools=yes -j2 editor/tools/debugger/debug_adapter/debug_adapter_server.cpp target_name=godot.windows.editor.x86_64.double.test
+          scons platform=windows target=editor arch=x86_64 precision=double tools=yes use_console=no target_name=godot.windows.editor.x86_64.double -j8
  
-      # 6️⃣ Upload the test artifact
-      - name: Upload quick build artifact
+      # 6️⃣ Upload the editor artifact
+      - name: Upload Godot editor
         uses: actions/upload-artifact@v4
         with:
-          name: godot-double-windows-quick-test
-          path: godot\bin\godot.windows.editor.x86_64.double.test.exe
+          name: godot-double-windows
+          path: godot\bin\godot.windows.editor.x86_64.double.exe
